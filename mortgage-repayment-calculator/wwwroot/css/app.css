@@ -1,3 +1,12 @@
+body {
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: normal;
+    font-style: normal;
+    margin: 0;
+    padding: 0;
+}
+
 .valid.modified:not([type=checkbox]) {
     outline: 1px solid #26b050;
 }

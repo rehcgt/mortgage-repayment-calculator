@@ -1,0 +1,65 @@
+﻿<div class="mb-3 col">
+    <label for="@InputId" class="form-label">@LabelText</label>
+    <div class="input-group @FocusClass">
+        @if (PutInputTextOnLeft)
+        {
+            <div class="input-group-text @FocusClass">@Unit</div>
+        }
+        <input type="number" step="0.01" class="form-control @InputFocusClass" id="@InputId" placeholder="@Placeholder" required @bind="@Value" @onfocusin="OnFocusAsync" @onfocusout="OnBlurAsync">
+        @if (!PutInputTextOnLeft)
+        {
+            <div class="input-group-text @FocusClass">@Unit</div>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string LabelText { get; set; } = "";
+
+    [Parameter]
+    public string InputId { get; set; } = "";
+
+    [Parameter]
+    public string Placeholder { get; set; } = "";
+
+    [Parameter]
+    public string Unit { get; set; } = "";
+
+    [Parameter]
+    public decimal? Value { get; set; }
+
+    [Parameter]
+    public bool PutInputTextOnLeft { get; set; } = false;
+
+    [Parameter]
+    public EventCallback<decimal?> ValueChanged { get; set; }
+
+    private string FocusClass { get; set; } = "";
+    private string InputFocusClass { get; set; } = "";
+    private decimal? previousValue;
+
+    private async Task OnFocusAsync()
+    {
+        FocusClass = "bg-warning";
+        InputFocusClass = "border-warning focus-ring focus-ring-warning";
+        await Task.CompletedTask;
+    }
+
+    private async Task OnBlurAsync()
+    {
+        FocusClass = "";
+        InputFocusClass = "";
+        await Task.CompletedTask;
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+        if (ValueChanged.HasDelegate && Value != previousValue)
+        {
+            previousValue = Value;
+            await ValueChanged.InvokeAsync(Value);
+        }
+    }
+}

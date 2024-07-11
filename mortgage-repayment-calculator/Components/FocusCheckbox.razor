@@ -1,0 +1,32 @@
+﻿<div class="p-3 @(IsSelected ? "border-warning bg-warning-subtle" : "border-black") rounded-1 m-1 border border-2">
+    <div class="form-check">
+        <input class="form-check-input border-1 border-black border" type="radio" name="@GroupName" id="@Id" value="@Value" checked="@IsSelected" @onchange="OnCheckedChanged" />
+        <label class="form-check-label" for="@Id">@Label</label>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string Id { get; set; } = "";
+
+    [Parameter]
+    public string GroupName { get; set; } = "";
+
+    [Parameter]
+    public string Label { get; set; } = "";
+
+    [Parameter]
+    public string Value { get; set; } = "";
+
+    [Parameter]
+    public bool IsSelected { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> IsSelectedChanged { get; set; }
+
+    private async Task OnCheckedChanged(ChangeEventArgs args)
+    {
+        IsSelected = (bool)args.Value;
+        await IsSelectedChanged.InvokeAsync(IsSelected);
+    }
+}

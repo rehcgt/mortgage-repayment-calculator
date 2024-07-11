@@ -1,7 +1,83 @@
 ﻿@page "/"
-
+@using mortgage_repayment_calculator.Components
 <PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
+<div class="h-100 d-flex align-items-center container">
+    <div class="d-flex w-100 justify-content-between rounded-5 shadow">
+        <div class="p-5 w-50">
+            <div class="d-flex justify-content-between align-items-baseline">
+                <h2>Mortgage Calculator</h2>
+                <a @onclick="@ClearAll">Clear All</a>
+            </div>
+            <div class="mt-5">
+                <div class="row mb-3">
+                    <FocusInput LabelText="Mortgage Amount" PutInputTextOnLeft="true" InputId="mortgage_amount" Placeholder="100.00" Unit="$" Value="@MortgageAmount" ValueChanged="@(amount => MortgageAmount = amount)" />
+                </div>
+                <div class="row">
+                    <div class="mb-3 col">
+                        <FocusInput LabelText="Mortgage Term" InputId="mortgage_term" Placeholder="5" Unit="years" Value="@MortgageTerm" ValueChanged="@(term => MortgageTerm = term)" />
+                    </div>
+                    <div class="mb-3 col">
+                        <FocusInput LabelText="Interest Range" InputId="interest_range" Placeholder="5.25" Unit="%" Value="@InterestRange" ValueChanged="@(range => InterestRange = range)" />
+                    </div>
+                </div>
+                <div class="row">
+                    <FocusCheckbox Id="repayment" GroupName="mortgage_type" Value="repayment" Label="Repayment" IsSelected="@(MortgageType == null || MortgageType == "repayment")" IsSelectedChanged="@(value => MortgageType = value ? "repayment" : "")" />
+                    <FocusCheckbox Id="interest_only" GroupName="mortgage_type" Value="interest_only" Label="Interest Only" IsSelected="@(MortgageType == "interest_only")" IsSelectedChanged="@(value => MortgageType = value ? "interest_only" : "")" />
+                </div>
+                <div class="row mt-4">
+                    <button type="submit" class="btn btn-warning rounded-4" @onclick="CalculateRepayments">
+                        <img src="/images/icon-calculator.svg" />
+                        <strong>Calculate Repayments</strong>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="p-5 w-50 bg-dark text-white rounded-5 d-flex align-items-center justify-content-center">
+            <div class="text-center">
+                @if (RepaymentAmount > 0)
+                {
+                    <h2>Repayment Amount</h2>
+                    <h3>$@RepaymentAmount</h3>
+                }
+                else
+                {
+                    <img src="/images/illustration-empty.svg" />
+                    <h3>Results shown here</h3>
+                    <div class="text-info">
+                        Complete the form and click "Calculate Payments" to see what your
+                        monthly repayments would be
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
 
-Welcome to your new app.
+@code {
+    private decimal? MortgageAmount { get; set; }
+    private decimal? MortgageTerm { get; set; }
+    private decimal? InterestRange { get; set; }
+    private string? MortgageType { get; set; }
+    private decimal? RepaymentAmount { get; set; }
+
+    private void CalculateRepayments()
+    {
+        // Calculate Repayments
+        if (MortgageAmount.HasValue && MortgageTerm.HasValue && InterestRange.HasValue && !string.IsNullOrEmpty(MortgageType))
+        {
+            RepaymentAmount = MortgageType == "Repayment"
+                ? MortgageAmount / (MortgageTerm * 12)
+                : MortgageAmount * (InterestRange / 100);
+        }
+    }
+
+    private void ClearAll()
+    {
+        MortgageAmount = null;
+        MortgageTerm = null;
+        InterestRange = null;
+        MortgageType = String.Empty;
+        RepaymentAmount = null;
+    }
+}
