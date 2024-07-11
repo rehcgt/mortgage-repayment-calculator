@@ -7,18 +7,18 @@
         <div class="p-5 w-50">
             <div class="d-flex justify-content-between align-items-baseline">
                 <h2>Mortgage Calculator</h2>
-                <a @onclick="@ClearAll">Clear All</a>
+                <a @onclick="@ClearAll" class="link-underline-dark link-dark" style="cursor:pointer;">Clear All</a>
             </div>
             <div class="mt-5">
                 <div class="row mb-3">
-                    <FocusInput LabelText="Mortgage Amount" PutInputTextOnLeft="true" InputId="mortgage_amount" Placeholder="100.00" Unit="$" Value="@MortgageAmount" ValueChanged="@(amount => MortgageAmount = amount)" />
+                    <FocusInput @ref="MortgageAmountInput" LabelText="Mortgage Amount" PutInputTextOnLeft="true" InputId="mortgage_amount" Placeholder="100.00" Unit="$" Value="@MortgageAmount" ValueChanged="@(amount => MortgageAmount = amount)" />
                 </div>
                 <div class="row">
                     <div class="mb-3 col">
-                        <FocusInput LabelText="Mortgage Term" InputId="mortgage_term" Placeholder="5" Unit="years" Value="@MortgageTerm" ValueChanged="@(term => MortgageTerm = term)" />
+                        <FocusInput @ref="MortgageTermInput" LabelText="Mortgage Term" InputId="mortgage_term" Placeholder="5" Unit="years" Value="@MortgageTerm" ValueChanged="@(term => MortgageTerm = term)" />
                     </div>
                     <div class="mb-3 col">
-                        <FocusInput LabelText="Interest Range" InputId="interest_range" Placeholder="5.25" Unit="%" Value="@InterestRange" ValueChanged="@(range => InterestRange = range)" />
+                        <FocusInput @ref="InterestRangeInput" LabelText="Interest Range" InputId="interest_range" Placeholder="5.25" Unit="%" Value="@InterestRange" ValueChanged="@(range => InterestRange = range)" />
                     </div>
                 </div>
                 <div class="row">
@@ -61,15 +61,35 @@
     private string MortgageType { get; set; } = "repayment";
     private decimal? RepaymentAmount { get; set; }
 
+    private FocusInput MortgageAmountInput;
+    private FocusInput MortgageTermInput;
+    private FocusInput InterestRangeInput;
+
+
     private void CalculateRepayments()
-    {        
+    {
         if (MortgageAmount.HasValue && MortgageTerm.HasValue && InterestRange.HasValue)
         {
             RepaymentAmount = MortgageType == "repayment"
                 ? MortgageAmount / (MortgageTerm * 12)
                 : MortgageAmount * (InterestRange / 100);
             RepaymentAmount = Math.Round(RepaymentAmount.Value, 2);
-        }        
+        }
+        else
+        {
+            if (!MortgageAmount.HasValue)
+            {
+                MortgageAmountInput.MarkAsDanger();
+            }
+            if (!MortgageTerm.HasValue)
+            {
+                MortgageTermInput.MarkAsDanger();
+            }
+            if (!InterestRange.HasValue)
+            {
+                InterestRangeInput.MarkAsDanger();
+            }
+        }
     }
 
     private void ClearAll()
@@ -77,7 +97,10 @@
         MortgageAmount = null;
         MortgageTerm = null;
         InterestRange = null;
-        MortgageType = String.Empty;
+        MortgageType = "repayment";
         RepaymentAmount = null;
+        MortgageAmountInput.Reset();
+        MortgageTermInput.Reset();
+        InterestRangeInput.Reset();
     }
 }
