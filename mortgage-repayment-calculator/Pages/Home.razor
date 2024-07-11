@@ -22,11 +22,11 @@
                     </div>
                 </div>
                 <div class="row">
-                    <FocusCheckbox Id="repayment" GroupName="mortgage_type" Value="repayment" Label="Repayment" IsSelected="@(MortgageType == null || MortgageType == "repayment")" IsSelectedChanged="@(value => MortgageType = value ? "repayment" : "")" />
-                    <FocusCheckbox Id="interest_only" GroupName="mortgage_type" Value="interest_only" Label="Interest Only" IsSelected="@(MortgageType == "interest_only")" IsSelectedChanged="@(value => MortgageType = value ? "interest_only" : "")" />
+                    <FocusCheckbox Id="repayment" GroupName="mortgage_type" Value="@MortgageType" Label="Repayment" IsSelected="@(MortgageType == null || MortgageType == "repayment")" IsSelectedChanged="@(value => MortgageType = value ? "repayment" : "")" />
+                    <FocusCheckbox Id="interest_only" GroupName="mortgage_type" Value="@MortgageType" Label="Interest Only" IsSelected="@(MortgageType == "interest_only")" IsSelectedChanged="@(value => MortgageType = value ? "interest_only" : "")" />
                 </div>
                 <div class="row mt-4">
-                    <button type="submit" class="btn btn-warning rounded-4" @onclick="CalculateRepayments">
+                    <button class="btn btn-warning rounded-4 w-75" @onclick="CalculateRepayments">
                         <img src="/images/icon-calculator.svg" />
                         <strong>Calculate Repayments</strong>
                     </button>
@@ -35,7 +35,7 @@
         </div>
         <div class="p-5 w-50 bg-dark text-white rounded-5 d-flex align-items-center justify-content-center">
             <div class="text-center">
-                @if (RepaymentAmount > 0)
+                @if (RepaymentAmount.HasValue)
                 {
                     <h2>Repayment Amount</h2>
                     <h3>$@RepaymentAmount</h3>
@@ -58,18 +58,18 @@
     private decimal? MortgageAmount { get; set; }
     private decimal? MortgageTerm { get; set; }
     private decimal? InterestRange { get; set; }
-    private string? MortgageType { get; set; }
+    private string MortgageType { get; set; } = "repayment";
     private decimal? RepaymentAmount { get; set; }
 
     private void CalculateRepayments()
-    {
-        // Calculate Repayments
-        if (MortgageAmount.HasValue && MortgageTerm.HasValue && InterestRange.HasValue && !string.IsNullOrEmpty(MortgageType))
+    {        
+        if (MortgageAmount.HasValue && MortgageTerm.HasValue && InterestRange.HasValue)
         {
-            RepaymentAmount = MortgageType == "Repayment"
+            RepaymentAmount = MortgageType == "repayment"
                 ? MortgageAmount / (MortgageTerm * 12)
                 : MortgageAmount * (InterestRange / 100);
-        }
+            RepaymentAmount = Math.Round(RepaymentAmount.Value, 2);
+        }        
     }
 
     private void ClearAll()

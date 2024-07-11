@@ -23,10 +23,11 @@
 
     [Parameter]
     public EventCallback<bool> IsSelectedChanged { get; set; }
-
+    
     private async Task OnCheckedChanged(ChangeEventArgs args)
     {
-        IsSelected = (bool)args.Value;
+        // Compara el valor de args.Value con el valor esperado para establecer IsSelected
+        IsSelected = args.Value.ToString() == Value;
         await IsSelectedChanged.InvokeAsync(IsSelected);
     }
 }

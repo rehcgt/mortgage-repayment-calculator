@@ -5,7 +5,7 @@
         {
             <div class="input-group-text @FocusClass">@Unit</div>
         }
-        <input type="number" step="0.01" class="form-control @InputFocusClass" id="@InputId" placeholder="@Placeholder" required @bind="@Value" @onfocusin="OnFocusAsync" @onfocusout="OnBlurAsync">
+        <input type="number" step="0.01" class="form-control @InputFocusClass" id="@InputId" @oninput="HandleInput" placeholder="@Placeholder" required @bind="@Value" @onfocusin="OnFocusAsync" @onfocusout="OnBlurAsync">
         @if (!PutInputTextOnLeft)
         {
             <div class="input-group-text @FocusClass">@Unit</div>
@@ -59,6 +59,15 @@
         if (ValueChanged.HasDelegate && Value != previousValue)
         {
             previousValue = Value;
+            await ValueChanged.InvokeAsync(Value);
+        }
+    }
+
+    private async Task HandleInput(ChangeEventArgs e)
+    {
+        if (decimal.TryParse(e.Value?.ToString(), out var newValue))
+        {
+            Value = newValue;
             await ValueChanged.InvokeAsync(Value);
         }
     }
