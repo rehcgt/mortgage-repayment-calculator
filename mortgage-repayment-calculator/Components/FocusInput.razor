@@ -31,17 +31,17 @@
     public string Unit { get; set; } = "";
 
     [Parameter]
-    public decimal? Value { get; set; }
+    public double? Value { get; set; }
 
     [Parameter]
     public bool PutInputTextOnLeft { get; set; } = false;
 
     [Parameter]
-    public EventCallback<decimal?> ValueChanged { get; set; }
+    public EventCallback<double?> ValueChanged { get; set; }
 
     private string FocusClass { get; set; } = "";
     private string InputFocusClass { get; set; } = "";
-    private decimal? previousValue;
+    private double? previousValue;
     private bool IsRequired { get; set; } = false;
     private string _displayValue = string.Empty;
 
@@ -50,7 +50,7 @@
         get => _displayValue;
         set
         {
-            if (decimal.TryParse(value, out var result))
+            if (double.TryParse(value, out var result))
             {
                 _displayValue = value;
                 Value = result;

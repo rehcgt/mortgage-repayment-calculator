@@ -6,7 +6,7 @@
         <div class="p-5 w-50">
             <div class="d-flex justify-content-between align-items-baseline">
                 <h2>Mortgage Calculator</h2>
-                <a @onclick="@ClearAll" class="link-underline-dark link-dark" style="cursor:pointer;">Clear All</a>
+                <a @onclick="@ClearAll" class="link-underline-dark link-dark link-opacity-75" style="cursor:pointer;">Clear All</a>
             </div>
             <div class="mt-5">
                 <div class="row mb-3">
@@ -32,27 +32,39 @@
                 </div>
             </div>
         </div>
-        <div class="p-5 w-50 bg-dark text-white rounded-5 d-flex align-items-center justify-content-center">
-            <div class="text-center">
+        <div class="p-5 w-50 bg-dark text-white rounded-bottom-5 rounded-end-5 d-flex align-items-center justify-content-center">
+            <div class="container">
                 @if (RepaymentAmount.HasValue)
                 {
-                    @if (MortgageType == "repayment")
-                    {
-                        <h2>Monthly Repayment</h2>
-                    }
-                    else
-                    {
-                        <h2>Interest Only Payment</h2>
-                    })                    
-                    <h3>$@RepaymentAmount</h3>
+                    <h3>Your Results</h3>
+                    <div class="text-info">
+                        Your results are shown below based on the information you provided.
+                        To adjust the results edit the form and click "Calculate Repayments" again.
+                    </div>
+                    <div class="bg-black border-top border-warning rounded-2 p-3 mt-2 rounded border-2">
+                        @if (MortgageType == "repayment")
+                        {
+                            <div class="text-info">Your monthly repayments</div>
+                        }
+                        else
+                        {
+                            <div class="text-info">Your interest only payment</div>
+                        }
+                        <h1 class="text-warning mt-2">$@String.Format("{0:N2}", RepaymentAmount)</h1>
+                        <hr />
+                        <div class="text-info mt-3">Total you'll repay over the term</div>
+                        <h3>$@String.Format("{0:N2}", TotalRepayment)</h3>
+                    </div>
                 }
                 else
                 {
-                    <img src="/images/illustration-empty.svg" />
-                    <h3>Results shown here</h3>
-                    <div class="text-info">
-                        Complete the form and click "Calculate Payments" to see what your
-                        monthly repayments would be
+                    <div class="text-center">
+                        <img src="/images/illustration-empty.svg" />
+                        <h3>Results shown here</h3>
+                        <div class="text-info">
+                            Complete the form and click "Calculate Payments" to see what your
+                            monthly repayments would be
+                        </div>
                     </div>
                 }
             </div>
@@ -61,11 +73,12 @@
 </div>
 
 @code {
-    private decimal? MortgageAmount { get; set; }
-    private decimal? MortgageTerm { get; set; }
-    private decimal? InterestRange { get; set; }
+    private double? MortgageAmount { get; set; }
+    private double? MortgageTerm { get; set; }
+    private double? InterestRange { get; set; }
     private string MortgageType { get; set; } = "repayment";
-    private decimal? RepaymentAmount { get; set; }
+    private double? RepaymentAmount { get; set; }
+    private double? TotalRepayment { get; set; }
 
     private FocusInput MortgageAmountInput;
     private FocusInput MortgageTermInput;
@@ -76,10 +89,18 @@
     {
         if (MortgageAmount.HasValue && MortgageTerm.HasValue && InterestRange.HasValue)
         {
+            //M = P [ I(1 + I)N ] / [ (1 + I)N − 1]
+            var P = MortgageAmount.Value;
+            var I = InterestRange.Value / 100;
+            var N = MortgageTerm.Value * 12;
+            var M = P * ((I * Math.Pow(1 + I, N)) / (Math.Pow(1 + I, N) - 1));
+            var IM = (M * N - P)/N;
+
             RepaymentAmount = MortgageType == "repayment"
-                ? MortgageAmount / (MortgageTerm * 12)
-                : MortgageAmount * (InterestRange / 100);
-            RepaymentAmount = Math.Round(RepaymentAmount.Value, 2);
+                ? RepaymentAmount = Math.Round(M, 2)
+                : RepaymentAmount = Math.Round(IM, 2);
+
+            TotalRepayment = RepaymentAmount * N;
         }
         else
         {
