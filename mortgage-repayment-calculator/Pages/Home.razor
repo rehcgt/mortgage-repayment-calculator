@@ -36,7 +36,14 @@
             <div class="text-center">
                 @if (RepaymentAmount.HasValue)
                 {
-                    <h2>Repayment Amount</h2>
+                    @if (MortgageType == "repayment")
+                    {
+                        <h2>Monthly Repayment</h2>
+                    }
+                    else
+                    {
+                        <h2>Interest Only Payment</h2>
+                    })                    
                     <h3>$@RepaymentAmount</h3>
                 }
                 else
